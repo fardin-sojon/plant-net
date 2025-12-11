@@ -1,6 +1,42 @@
+import { useQuery } from '@tanstack/react-query';
 import PlantDataRow from '../../../components/Dashboard/TableRows/PlantDataRow'
+import toast from 'react-hot-toast'
+import useAuth from '../../../hooks/useAuth';
+import axios from 'axios';
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
+
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
 const MyInventory = () => {
+
+   const {user} = useAuth()
+   const axiosSecure = useAxiosSecure()
+
+  const {
+    data: plants = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["plant", user?.email],
+    queryFn: async () => {
+      const res = await axios(`${import.meta.env.VITE_API_URL}/my-inventory/${user?.email}`)
+      return res.data;
+    },
+  });
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosSecure.delete(`/plants/${id}`);
+      refetch();
+      toast.success("Delete Successful");
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+    }
+  };
+
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -56,7 +92,14 @@ const MyInventory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <PlantDataRow />
+                  {plants.map((plant) => (
+                    <PlantDataRow
+                      key={plant._id}
+                      plant={plant}
+                      handleDelete={handleDelete}
+                      refetch={refetch}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>

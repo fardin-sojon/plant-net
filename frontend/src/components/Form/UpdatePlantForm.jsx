@@ -1,7 +1,9 @@
-const UpdatePlantForm = () => {
+const UpdatePlantForm = ({ handleSubmit, plantData, loading }) => {
+  const { name, category, price, quantity, description } = plantData || {}
+
   return (
     <div className='w-full flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50'>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className='grid grid-cols-1 gap-10'>
           <div className='space-y-6'>
             {/* Name */}
@@ -15,6 +17,7 @@ const UpdatePlantForm = () => {
                 id='name'
                 type='text'
                 placeholder='Plant Name'
+                defaultValue={name}
                 required
               />
             </div>
@@ -27,6 +30,7 @@ const UpdatePlantForm = () => {
                 required
                 className='w-full px-4 py-3 border-lime-300 focus:outline-lime-500 rounded-md bg-white'
                 name='category'
+                defaultValue={category}
               >
                 <option value='Indoor'>Indoor</option>
                 <option value='Outdoor'>Outdoor</option>
@@ -45,6 +49,7 @@ const UpdatePlantForm = () => {
                 placeholder='Write plant description here...'
                 className='block rounded-md focus:lime-300 w-full h-32 px-4 py-3 text-gray-800  border border-lime-300 bg-white focus:outline-lime-500 '
                 name='description'
+                defaultValue={description}
               ></textarea>
             </div>
           </div>
@@ -62,6 +67,7 @@ const UpdatePlantForm = () => {
                   id='price'
                   type='number'
                   placeholder='Price per unit'
+                  defaultValue={price}
                   required
                 />
               </div>
@@ -77,6 +83,7 @@ const UpdatePlantForm = () => {
                   id='quantity'
                   type='number'
                   placeholder='Available quantity'
+                  defaultValue={quantity}
                   required
                 />
               </div>
@@ -107,7 +114,7 @@ const UpdatePlantForm = () => {
               type='submit'
               className='w-full cursor-pointer p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-lime-500 '
             >
-              Update Plant
+              {loading ? 'Updating...' : 'Update Plant'}
             </button>
           </div>
         </div>

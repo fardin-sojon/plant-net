@@ -1,10 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { FcGoogle } from "react-icons/fc";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useAuth from "../../hooks/useAuth";
 import { toast } from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { useForm } from "react-hook-form";
 import { imageUpload } from "../../utils";
+import { useState } from "react";
 
 // axios.<method> will now provide autocomplete and parameter typings
 
@@ -12,6 +14,7 @@ import { imageUpload } from "../../utils";
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, loading } =
     useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordRegex =
@@ -19,6 +22,8 @@ const SignUp = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm();
   // console.log(watch);
@@ -134,6 +139,7 @@ const SignUp = () => {
               )}
             </div>
             {/* Image */}
+            {/* Image */}
             <div>
               <label
                 htmlFor="image"
@@ -141,22 +147,42 @@ const SignUp = () => {
               >
                 Profile Image
               </label>
-              <input
-                name="image"
-                type="file"
-                id="image"
-                accept="image/*"
-                className="block w-full text-sm text-gray-500
-      file:mr-4 file:py-2 file:px-4
-      file:rounded-md file:border-0
-      file:text-sm file:font-semibold
-      file:bg-lime-50 file:text-lime-700
-      hover:file:bg-lime-100
-      bg-gray-100 border border-dashed border-lime-300 rounded-md cursor-pointer
-      focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400
-      py-2"
-                {...register("image")}
-              />
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <input
+                    name="image"
+                    type="file"
+                    id="image"
+                    accept="image/*"
+                    className="block w-full text-sm text-gray-500
+          file:mr-4 file:py-2 file:px-4
+          file:rounded-md file:border-0
+          file:text-sm file:font-semibold
+          file:bg-lime-50 file:text-lime-700
+          hover:file:bg-lime-100
+          bg-gray-100 border border-dashed border-lime-300 rounded-md cursor-pointer
+          focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400
+          py-2"
+                    {...register("image")}
+                  />
+                </div>
+                {watch("image") && watch("image").length > 0 && (
+                  <div className="relative w-16 h-16">
+                    <img
+                      src={URL.createObjectURL(watch("image")[0])}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-full border-2 border-lime-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setValue("image", null)}
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md z-10"
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+              </div>
               <p className="mt-1 text-xs text-gray-400">
                 PNG, JPG or JPEG (max 2MB)
               </p>
@@ -188,22 +214,31 @@ const SignUp = () => {
                   Password
                 </label>
               </div>
-              <input
-                type="password"
-                name="password"
-                autoComplete="new-password"
-                id="password"
-                required
-                placeholder="*******"
-                className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-lime-500 bg-gray-200 text-gray-900"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: 8,
-                  pattern: passwordRegex,
-                  // message:
-                  //   "Password must be ≥8 chars and include uppercase, lowercase, number and special character.",
-                })}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  autoComplete="new-password"
+                  id="password"
+                  required
+                  placeholder="*******"
+                  className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-lime-500 bg-gray-200 text-gray-900 pr-10"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: 8,
+                    pattern: passwordRegex,
+                    // message:
+                    //   "Password must be ≥8 chars and include uppercase, lowercase, number and special character.",
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-600 focus:outline-none"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
               {errors.password?.type === "required" && (
                 <p className="text-red-500">Password is required.</p>
               )}

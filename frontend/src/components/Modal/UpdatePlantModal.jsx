@@ -1,7 +1,62 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import UpdatePlantForm from '../Form/UpdatePlantForm'
+import { useState } from 'react'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import { imageUpload } from '../../utils'
+import useAxiosSecure from '../../hooks/useAxiosSecure'
 
-const UpdatePlantModal = ({ setIsEditModalOpen, isOpen }) => {
+const UpdatePlantModal = ({ setIsEditModalOpen, isOpen, plant, refetch }) => {
+  const [loading, setLoading] = useState(false)
+  const axiosSecure = useAxiosSecure()
+
+  const handleSubmit = async e => {
+    setLoading(true)
+    e.preventDefault()
+    const form = e.target
+    const name = form.name.value
+    const category = form.category.value
+    const price = form.price.value
+    const quantity = form.quantity.value
+    const description = form.description.value
+    const image = form.image.files[0]
+    let imageUrl = plant.image
+
+    if (image) {
+      imageUrl = await imageUpload(image)
+    }
+
+    // update plant data
+    const plantData = {
+      name,
+      category,
+      price,
+      quantity,
+      description,
+      image: imageUrl,
+      seller: {
+        email: plant?.seller?.email,
+        name: plant?.seller?.name,
+        image: plant?.seller?.image,
+      },
+    }
+
+    try {
+      // post request
+      await axiosSecure.patch(
+        `/plants/${plant?._id}`,
+        plantData
+      )
+      toast.success('Data Updated Successfully!')
+      refetch()
+      setIsEditModalOpen(false)
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+      toast.error(err.message)
+    }
+  }
   return (
     <Dialog
       open={isOpen}
@@ -30,7 +85,11 @@ const UpdatePlantModal = ({ setIsEditModalOpen, isOpen }) => {
               Update Plant Info
             </DialogTitle>
             <div className='mt-2 w-full'>
-              <UpdatePlantForm />
+              <UpdatePlantForm
+                handleSubmit={handleSubmit}
+                plantData={plant}
+                loading={loading}
+              />
             </div>
           </DialogPanel>
         </div>

@@ -50,22 +50,29 @@ const AuthProvider = ({ children }) => {
 
   // onAuthStateChange
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("CurrentUser-->", currentUser?.email);
-      setUser(currentUser);
-      setLoading(false);
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    if (currentUser) {
+      const email =
+        currentUser.email ||
+        currentUser.providerData?.[0]?.email ||
+        null;
 
-      if (currentUser) {
-        const email = currentUser.email || currentUser.providerData[0]?.email;
-        setUser({ ...currentUser, email });
-      } else {
-        setUser(null);
-      }
-    });
-    return () => {
-      return unsubscribe();
-    };
-  }, []);
+      const formattedUser = {
+        ...currentUser,
+        email: email,
+      };
+
+      setUser(formattedUser);
+      console.log("CurrentUser-->", formattedUser?.email);
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   const authInfo = {
     user,

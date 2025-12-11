@@ -54,6 +54,8 @@ const AddPlantForm = () => {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm();
 
@@ -160,7 +162,6 @@ const AddPlantForm = () => {
                   name="price"
                   id="price"
                   type="number"
-                  defaultValue={0}
                   placeholder="Price per unit"
                   {...register("price", { required: true })}
                 />
@@ -211,6 +212,24 @@ const AddPlantForm = () => {
                   </label>
                 </div>
               </div>
+              {watch("image") && watch("image").length > 0 && (
+                <div className="flex justify-center mt-4">
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-300 shadow-sm">
+                    <img
+                      src={URL.createObjectURL(watch("image")[0])}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setValue("image", null)}
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                    >
+                      X
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

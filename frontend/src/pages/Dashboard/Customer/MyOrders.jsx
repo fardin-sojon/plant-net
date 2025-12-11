@@ -1,6 +1,41 @@
+import { useQuery } from '@tanstack/react-query';
 import CustomerOrderDataRow from '../../../components/Dashboard/TableRows/CustomerOrderDataRow'
+import toast from 'react-hot-toast'
+import axios from 'axios';
+import useAuth from '../../../hooks/useAuth';
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
 
 const MyOrders = () => {
+
+  const {user} = useAuth()
+
+  const {
+    data: orders = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["orders", user?.email],
+    queryFn: async () => {
+      const res = await axios(`${import.meta.env.VITE_API_URL}/my-orders/${user?.email}`)
+      return res.data;
+    },
+  });
+
+  console.log(orders);
+  
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/orders/${id}`);
+      refetch();
+      toast.success("Order canceled successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error(err.response.data.message);
+    }
+  };
+
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <>
       <div className='container mx-auto px-4 sm:px-8'>
@@ -56,7 +91,13 @@ const MyOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <CustomerOrderDataRow />
+                  {orders.map((order) => (
+                    <CustomerOrderDataRow
+                      key={order._id}
+                      order={order}
+                      handleDelete={handleDelete}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>
