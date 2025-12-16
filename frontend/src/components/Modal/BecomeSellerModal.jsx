@@ -1,11 +1,32 @@
 import { Dialog, DialogTitle, DialogPanel } from '@headlessui/react'
+import useAxiosSecure from '../../hooks/useAxiosSecure'
+import useAuth from '../../hooks/useAuth'
+import toast from 'react-hot-toast'
+
 const BecomeSellerModal = ({ closeModal, isOpen }) => {
+  const { user } = useAuth()
+  const axiosSecure = useAxiosSecure()
+
+  const handleRequest = async () => {
+    try {
+      const { data } = await axiosSecure.patch(`/users/update/${user?.email}`, {
+        status: 'Requested',
+      })
+      console.log(data)
+      toast.success('Successfully applied to become a seller')
+      closeModal()
+    } catch (err) {
+      console.log(err)
+      toast.error(err.response.data.message)
+    }
+  }
+
   return (
     <Dialog
       open={isOpen}
       as='div'
       className='relative z-10 focus:outline-none '
-      onClose={close}
+      onClose={closeModal}
     >
       <div className='fixed inset-0 z-10 w-screen overflow-y-auto'>
         <div className='flex min-h-full items-center justify-center p-4'>
@@ -27,6 +48,7 @@ const BecomeSellerModal = ({ closeModal, isOpen }) => {
             <hr className='mt-8 ' />
             <div className='flex mt-2 justify-around'>
               <button
+                onClick={handleRequest}
                 type='button'
                 className='cursor-pointer inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
               >

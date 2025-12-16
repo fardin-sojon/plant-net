@@ -4,7 +4,7 @@ const CustomerOrderDataRow = ({ order, handleDelete }) => {
   let [isOpen, setIsOpen] = useState(false)
   const closeModal = () => setIsOpen(false)
 
-  const { _id, image, name, category, price, quantity, status } = order || {}
+  const { _id, image, name, category, price, quantity, status, address } = order || {}
 
   return (
     <tr>
@@ -41,6 +41,7 @@ const CustomerOrderDataRow = ({ order, handleDelete }) => {
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
         <button
           onClick={() => setIsOpen(true)}
+          disabled={status === 'Delivered' || status === 'In Progress'}
           className='relative disabled:cursor-not-allowed cursor-pointer inline-block px-3 py-1 font-semibold text-lime-900 leading-tight'
         >
           <span className='absolute cursor-pointer inset-0 bg-red-200 opacity-50 rounded-full'></span>

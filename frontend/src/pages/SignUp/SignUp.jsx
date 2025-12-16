@@ -5,14 +5,14 @@ import useAuth from "../../hooks/useAuth";
 import { toast } from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { useForm } from "react-hook-form";
-import { imageUpload } from "../../utils";
+import { imageUpload, saveOrUpdateUser } from "../../utils";
 import { useState } from "react";
 
 // axios.<method> will now provide autocomplete and parameter typings
 
 
 const SignUp = () => {
-  const { createUser, updateUserProfile, signInWithGoogle, loading } =
+  const { createUser, updateUserProfile, signInWithGoogle, loading, setLoading } =
     useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -40,6 +40,7 @@ const SignUp = () => {
     // formData.append("image", imageFile);
 
     try {
+      setLoading(true)
       // IMageBB
       // const {data} = await axios.post(
       //   `https://api.imgbb.com/1/upload?key=${
@@ -58,12 +59,19 @@ const SignUp = () => {
         name,
         imageURL
       );
-      console.log(result);
+
+      // save or update user in db
+      await saveOrUpdateUser({
+        name,
+        image: imageURL,
+        email,
+      })
       navigate(from, { replace: true });
       toast.success("Signup Successful");
     } catch (err) {
       console.log(err);
       toast.error(err?.message);
+      setLoading(false)
     }
   };
   // form submit handler
@@ -98,8 +106,13 @@ const SignUp = () => {
     try {
       //User Registration using google
       const result = await signInWithGoogle();
-      await result.user.reload();
-      console.log(result);
+      const user = result.user
+      // save or update user in db
+      await saveOrUpdateUser({
+        name: user?.displayName,
+        image: user?.photoURL,
+        email: user?.email,
+      })
       navigate(from, { replace: true });
       toast.success("Signup Successful");
     } catch (err) {
@@ -163,7 +176,7 @@ const SignUp = () => {
           bg-gray-100 border border-dashed border-lime-300 rounded-md cursor-pointer
           focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400
           py-2"
-                    {...register("image")}
+                    {...register("image", { required: true })}
                   />
                 </div>
                 {watch("image") && watch("image").length > 0 && (

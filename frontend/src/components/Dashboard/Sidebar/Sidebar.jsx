@@ -14,23 +14,32 @@ import AdminMenu from './Menu/AdminMenu'
 import SellerMenu from './Menu/SellerMenu'
 import CustomerMenu from './Menu/CustomerMenu'
 
+
+
+import useRole from '../../../hooks/useRole'
+
 const Sidebar = () => {
   const { logOut } = useAuth()
   const [isActive, setActive] = useState(false)
+  const [role] = useRole()
 
   // Sidebar Responsive Handler
   const handleToggle = () => {
     setActive(!isActive)
   }
-
   return (
     <>
-      {/* Small Screen Navbar, only visible till md breakpoint */}
+      {/* Small Screen Navbar */}
       <div className='bg-gray-100 text-gray-800 flex justify-between md:hidden'>
         <div>
           <div className='block cursor-pointer p-4 font-bold'>
             <Link to='/'>
-              <img src={logo} alt='logo' width='100' height='100' />
+              <img
+                src={logo}
+                alt='logo'
+                width='100'
+                height='100'
+              />
             </Link>
           </div>
         </div>
@@ -46,18 +55,15 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={`z-10 md:fixed flex flex-col justify-between overflow-x-hidden bg-gray-100 w-64 space-y-6 px-2 py-4 absolute inset-y-0 left-0 transform ${
-          isActive && '-translate-x-full'
+          isActive ? 'translate-x-0' : '-translate-x-full'
         }  md:translate-x-0  transition duration-200 ease-in-out`}
       >
         <div className='flex flex-col h-full'>
           {/* Top Content */}
-          <div>
-            {/* Logo */}
-            <div className='w-full hidden md:flex px-4 py-2 shadow-lg rounded-lg justify-center items-center bg-lime-100 mx-auto'>
-              <Link to='/'>
-                <img src={logo} alt='logo' width='100' height='100' />
-              </Link>
-            </div>
+          <div className='w-full flex px-4 py-2 shadow-lg rounded-lg justify-center items-center bg-lime-100 mx-auto'>
+            <Link to='/'>
+              <img src={logo} alt='logo' width='100' height='100' />
+            </Link>
           </div>
 
           {/* Middle Content */}
@@ -71,9 +77,15 @@ const Sidebar = () => {
                 address='/dashboard'
               />
               {/* Role-Based Menu */}
-              <CustomerMenu />
-              <SellerMenu />
-              <AdminMenu />
+              {role === 'customer' && <CustomerMenu />}
+              {role === 'seller' && <SellerMenu />}
+              {role === 'admin' && (
+                <>
+                  <AdminMenu />
+                  <SellerMenu />
+                  <CustomerMenu />
+                </>
+              )}
             </nav>
           </div>
 

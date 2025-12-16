@@ -1,11 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
 import PlantDataRow from '../../../components/Dashboard/TableRows/PlantDataRow'
+import InventoryCard from '../../../components/Dashboard/Cards/InventoryCard'
 import toast from 'react-hot-toast'
 import useAuth from '../../../hooks/useAuth';
-import axios from 'axios';
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query'
 import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
 
-import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
 const MyInventory = () => {
 
@@ -17,10 +17,10 @@ const MyInventory = () => {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["plant", user?.email],
+    queryKey: ['plants', user?.email || user?.providerData[0]?.email],
     queryFn: async () => {
-      const res = await axios(`${import.meta.env.VITE_API_URL}/my-inventory/${user?.email}`)
-      return res.data;
+      const { data } = await axiosSecure(`/my-inventory/${user?.email || user?.providerData[0]?.email}`)
+      return data
     },
   });
 
@@ -43,7 +43,7 @@ const MyInventory = () => {
         <div className='py-8'>
           <div className='-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto'>
             <div className='inline-block min-w-full shadow rounded-lg overflow-hidden'>
-              <table className='min-w-full leading-normal'>
+              <table className='min-w-full leading-normal hidden md:table'>
                 <thead>
                   <tr>
                     <th
@@ -102,6 +102,17 @@ const MyInventory = () => {
                   ))}
                 </tbody>
               </table>
+               {/* Mobile View: Cards */}
+              <div className='md:hidden flex flex-col gap-4 p-4 bg-gray-50'>
+                  {plants.map((plant) => (
+                      <InventoryCard
+                        key={plant._id}
+                        plant={plant}
+                         handleDelete={handleDelete}
+                         refetch={refetch}
+                      />
+                  ))}
+               </div>
             </div>
           </div>
         </div>

@@ -1,8 +1,18 @@
 import useAuth from '../../../hooks/useAuth'
 import coverImg from '../../../assets/images/cover.jpg'
+import useRole from '../../../hooks/useRole'
+import { useState } from 'react'
+import UpdateProfileModal from '../../../components/Modal/UpdateProfileModal'
+import ChangePasswordModal from '../../../components/Modal/ChangePasswordModal'
 
 const Profile = () => {
   const { user } = useAuth()
+  const [role] = useRole()
+  console.log(user)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(
+    false
+  )
 
   return (
     <div className='flex justify-center items-center h-screen'>
@@ -21,11 +31,8 @@ const Profile = () => {
             />
           </a>
 
-          <p className='p-2 px-4 text-xs text-white bg-lime-500 rounded-full'>
-            Customer
-          </p>
-          <p className='mt-2 text-xl font-medium text-gray-800 '>
-            User Id: {user?.uid}
+          <p className='p-2 px-4 text-xs text-white bg-lime-500 rounded-full capitalize'>
+            {role}
           </p>
           <div className='w-full p-2 mt-4 rounded-lg'>
             <div className='flex flex-wrap items-center justify-between text-sm text-gray-600 '>
@@ -37,21 +44,40 @@ const Profile = () => {
               </p>
               <p className='flex flex-col'>
                 Email
-                <span className='font-bold text-gray-600 '>{user?.email}</span>
+                <span className='font-bold text-gray-600 '>{user?.email || user?.providerData[0]?.email}</span>
               </p>
 
               <div>
-                <button className='bg-lime-500  px-10 py-1 rounded-lg text-white cursor-pointer hover:bg-lime-800 block mb-1'>
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className='bg-lime-500  px-10 py-1 rounded-lg text-white cursor-pointer hover:bg-lime-800 block mb-1'
+                >
                   Update Profile
                 </button>
-                <button className='bg-lime-500 px-7 py-1 rounded-lg text-white cursor-pointer hover:bg-lime-800'>
-                  Change Password
-                </button>
+                {/* Only show if user is NOT logged in via social */}
+                {/* Simple check: providerId === 'password' implies email/password login */}
+                {/* Note: Google providerId is 'google.com' */}
+                {user?.providerData[0]?.providerId === 'password' && (
+                  <button
+                    onClick={() => setIsChangePasswordModalOpen(true)}
+                    className='bg-lime-500 px-7 py-1 rounded-lg text-white cursor-pointer hover:bg-lime-800'
+                  >
+                    Change Password
+                  </button>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+      <UpdateProfileModal
+        isOpen={isEditModalOpen}
+        setIsOpen={setIsEditModalOpen}
+      />
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        setIsOpen={setIsChangePasswordModalOpen}
+      />
     </div>
   )
 }

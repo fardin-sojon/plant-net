@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 
 const Card = ({plant}) => {
 
-  console.log(plant);
+  // console.log(plant);
   const {_id, name, image, category, quantity, price} = plant
 
   return (

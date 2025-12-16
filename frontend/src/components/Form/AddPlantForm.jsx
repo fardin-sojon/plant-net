@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { imageUpload } from "../../utils";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
@@ -11,6 +12,7 @@ import toast from "react-hot-toast";
 
 const AddPlantForm = () => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   // useMutation hook useCase(POST || PUT || PATCH || DELETE)
   const {
@@ -60,6 +62,7 @@ const AddPlantForm = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
+    setLoading(true);
     // console.log(data);
     const { name, description, quantity, price, category, image } = data;
     const imageFile = image[0];
@@ -74,9 +77,9 @@ const AddPlantForm = () => {
         quantity: Number(quantity),
         category,
         seller: {
-          image: user?.photoURL,
           name: user?.displayName,
-          email: user?.email,
+          image: user?.photoURL,
+          email: user?.email || user?.providerData[0]?.email,
         },
       };
       await mutateAsync(plantData);
@@ -84,6 +87,8 @@ const AddPlantForm = () => {
       reset();
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -237,7 +242,7 @@ const AddPlantForm = () => {
               type="submit"
               className="w-full cursor-pointer p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-lime-500 "
             >
-              {isPending ? (
+              {loading || isPending ? (
                 <TbFidgetSpinner className="animate-spin m-auto" />
               ) : (
                 "Save & Continue"

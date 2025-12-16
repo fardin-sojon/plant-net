@@ -1,5 +1,18 @@
+import { useState, useEffect } from 'react'
+
 const UpdatePlantForm = ({ handleSubmit, plantData, loading }) => {
-  const { name, category, price, quantity, description } = plantData || {}
+  const { name, category, price, quantity, description, image } = plantData || {}
+  const [imagePreview, setImagePreview] = useState(image)
+
+  const handleImageChange = image => {
+    setImagePreview(URL.createObjectURL(image))
+  }
+
+  useEffect(() => {
+    if (plantData?.image) {
+      setImagePreview(plantData.image)
+    }
+  }, [plantData])
 
   return (
     <div className='w-full flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50'>
@@ -100,6 +113,7 @@ const UpdatePlantForm = ({ handleSubmit, plantData, loading }) => {
                       id='image'
                       accept='image/*'
                       hidden
+                      onChange={e => handleImageChange(e.target.files[0])}
                     />
                     <div className='bg-lime-500 text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-lime-500'>
                       Upload Image
@@ -107,6 +121,29 @@ const UpdatePlantForm = ({ handleSubmit, plantData, loading }) => {
                   </label>
                 </div>
               </div>
+              {imagePreview && (
+                <div className="flex justify-center mt-4">
+                  <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-300 shadow-sm">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    {imagePreview !== plantData?.image && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImagePreview(plantData?.image);
+                          document.getElementById("image").value = "";
+                        }}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md z-10"
+                      >
+                        X
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

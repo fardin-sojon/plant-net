@@ -19,6 +19,7 @@
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "firebase": "^12.6.0",
+    "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.67.0",
@@ -28,6 +29,7 @@
     "react-spinners": "^0.17.0",
     "stripe": "^20.0.0",
     "sweetalert2": "^11.26.3",
+    "swiper": "^12.0.3",
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {

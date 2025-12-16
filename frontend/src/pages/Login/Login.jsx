@@ -5,6 +5,7 @@ import useAuth from '../../hooks/useAuth'
 import { FcGoogle } from 'react-icons/fc'
 import { TbFidgetSpinner } from 'react-icons/tb'
 import { useForm } from "react-hook-form";
+import { imageUpload, saveOrUpdateUser } from '../../utils'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 
@@ -18,6 +19,9 @@ const Login = () => {
   const {
     register,
     handleSubmit,
+    getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm();
 
@@ -30,13 +34,25 @@ const Login = () => {
 
     try {
       //User Login
-      await signIn(email, password)
+      const result = await signIn(email, password)
+      const user = result.user
+      
+      await saveOrUpdateUser({
+        name: user?.displayName,
+        image: user?.photoURL,
+        email: user?.email || email,
+      })
 
       navigate(from, { replace: true })
       toast.success('Login Successful')
     } catch (err) {
       console.log(err)
-      toast.error(err?.message)
+      setLoading(false)
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError('root', { type: 'manual', message: 'Invalid email or password' })
+      } else {
+        toast.error(err?.message)
+      }
     }
   }
 
@@ -44,7 +60,15 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     try {
       //User Registration using google
-      await signInWithGoogle()
+      const result = await signInWithGoogle()
+      const user = result.user
+      // save or update user in db
+      await saveOrUpdateUser({
+        name: user?.displayName,
+        image: user?.photoURL,
+        email: user?.email || user?.providerData[0]?.email,
+      })
+
       navigate(from, { replace: true })
       toast.success('Login Successful')
     } catch (err) {
@@ -53,6 +77,8 @@ const Login = () => {
       toast.error(err?.message)
     }
   }
+
+
   return (
     <div className='flex justify-center items-center min-h-screen bg-white'>
       <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -81,12 +107,16 @@ const Login = () => {
                 placeholder='Enter Your Email Here'
                 className='w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-lime-500 bg-gray-200 text-gray-900'
                 data-temp-mail-org='0'
-                {...register("email", { required: true })}
+                {...register("email", {
+                  required: "Email is required",
+                  onChange: () => clearErrors('root'),
+                })}
               />
-              {errors.email?.type === "required" && (
-                <p className="text-red-500">Email is required.</p>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
               )}
             </div>
+
             <div>
               <div className='flex justify-between'>
                 <label htmlFor='password' className='text-sm mb-2'>
@@ -102,6 +132,10 @@ const Login = () => {
                   required
                   placeholder='*******'
                   className='w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-lime-500 bg-gray-200 text-gray-900 pr-10'
+                  {...register("password", {
+                    required: "Password is required",
+                    onChange: () => clearErrors('root'),
+                  })}
                 />
                 <button
                   type="button"
@@ -111,7 +145,15 @@ const Login = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              )}
             </div>
+            {errors.root && (
+                <div className="text-red-500 text-sm text-center font-medium mt-2">
+                    {errors.root.message}
+                </div>
+            )}
           </div>
 
           <div>
@@ -128,7 +170,14 @@ const Login = () => {
           </div>
         </form>
         <div className='space-y-1'>
-          <button className='text-xs hover:underline hover:text-lime-500 text-gray-400 cursor-pointer'>
+          <button
+            type='button'
+            onClick={() => {
+              const email = getValues("email");
+              navigate('/forget-password', { state: { email } });
+            }}
+            className='text-xs hover:underline hover:text-lime-500 text-gray-400 cursor-pointer'
+          >
             Forgot password?
           </button>
         </div>

@@ -8,6 +8,7 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { app } from "../firebase/firebase.config";
 import { AuthContext } from "./AuthContext";
@@ -48,22 +49,22 @@ const AuthProvider = ({ children }) => {
     });
   };
 
+  const resetPassword = (email) => {
+    setLoading(true);
+    return sendPasswordResetEmail(auth, email);
+  };
+
   // onAuthStateChange
   useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    console.log("CurrentUser-->", currentUser)
+    if (currentUser?.email) {
+        console.log("User Email: ", currentUser.email)
+    } else {
+        console.log("User Email (from Provider): ", currentUser?.providerData[0]?.email)
+    }
     if (currentUser) {
-      const email =
-        currentUser.email ||
-        currentUser.providerData?.[0]?.email ||
-        null;
-
-      const formattedUser = {
-        ...currentUser,
-        email: email,
-      };
-
-      setUser(formattedUser);
-      console.log("CurrentUser-->", formattedUser?.email);
+      setUser(currentUser);
     } else {
       setUser(null);
     }
@@ -83,7 +84,9 @@ const AuthProvider = ({ children }) => {
     signIn,
     signInWithGoogle,
     logOut,
+    logOut,
     updateUserProfile,
+    resetPassword,
   };
 
   return (
