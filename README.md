@@ -7,10 +7,8 @@ The platform emphasizes a clean user experience, secure transactions, and effici
 
 ---
 
-## 🌐 Live URL
-🔗 [Live Site Link Here]([Add Your Live Link])
-
----
+### 
+🔗 [🌐 Live Link](https://plant-net-project.netlify.app)
 
 ## 🗝 Key Features
 
