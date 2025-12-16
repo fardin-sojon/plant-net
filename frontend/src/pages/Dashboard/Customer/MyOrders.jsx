@@ -24,7 +24,7 @@ const MyOrders = () => {
     },
   });
 
-  console.log(orders);
+  // console.log(orders);
   
   const handleDelete = async (id) => {
     try {
@@ -32,7 +32,7 @@ const MyOrders = () => {
       refetch();
       toast.success("Order canceled successfully");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       toast.error(err.response.data.message);
     }
   };

@@ -43,7 +43,7 @@ const UpdateProfileModal = ({ isOpen, setIsOpen }) => {
             toast.success('Profile Updated Successfully')
             setIsOpen(false)
         } catch (err) {
-            console.log(err)
+            // console.log(err)
             toast.error(err.message)
         } finally {
             setLoading(false)

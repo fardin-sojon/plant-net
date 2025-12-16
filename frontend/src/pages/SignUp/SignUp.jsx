@@ -69,7 +69,7 @@ const SignUp = () => {
       navigate(from, { replace: true });
       toast.success("Signup Successful");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       toast.error(err?.message);
       setLoading(false)
     }
@@ -116,7 +116,7 @@ const SignUp = () => {
       navigate(from, { replace: true });
       toast.success("Signup Successful");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       toast.error(err?.message);
     }
   };

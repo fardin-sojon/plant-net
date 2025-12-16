@@ -36,7 +36,7 @@ const ManageOrders = () => {
       refetch();
       toast.success("Order canceled successfully");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       toast.error(err.response.data.message);
     }
   };
@@ -51,7 +51,7 @@ const ManageOrders = () => {
         await axiosSecure.patch(`/orders/status/${id}`, { status })
         toast.success("Status Updated")
     } catch (err) {
-        console.log(err)
+        // console.log(err)
         toast.error(err.response.data.message)
         // Revert on error (optional but good practice, keeping simple for now or refetch)
         refetch()

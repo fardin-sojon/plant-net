@@ -8,7 +8,7 @@ import ChangePasswordModal from '../../../components/Modal/ChangePasswordModal'
 const Profile = () => {
   const { user } = useAuth()
   const [role] = useRole()
-  console.log(user)
+  // console.log(user)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(
     false

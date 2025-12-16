@@ -12,11 +12,11 @@ const BecomeSellerModal = ({ closeModal, isOpen }) => {
       const { data } = await axiosSecure.patch(`/users/update/${user?.email}`, {
         status: 'Requested',
       })
-      console.log(data)
+      // console.log(data)
       toast.success('Successfully applied to become a seller')
       closeModal()
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       toast.error(err.response.data.message)
     }
   }

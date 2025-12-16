@@ -11,7 +11,7 @@ import { FiSun, FiMoon } from 'react-icons/fi'
 const Navbar = () => {
   const { user, logOut } = useAuth()
   const { theme, toggleTheme } = useContext(ThemeContext)
-  console.log(user);
+  // console.log(user);
   const [isOpen, setIsOpen] = useState(false)
 
   return (

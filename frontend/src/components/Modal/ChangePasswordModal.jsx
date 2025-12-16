@@ -29,7 +29,7 @@ const ChangePasswordModal = ({ isOpen, setIsOpen }) => {
             reset()
             setIsOpen(false)
         } catch (err) {
-            console.log(err)
+            // console.log(err)
             if (err.code === 'auth/wrong-password') {
                 setError('oldPassword', {
                     type: 'manual',

@@ -24,7 +24,7 @@ const AddPlantForm = () => {
     mutationFn: async (payload) =>
       await axios.post(`${import.meta.env.VITE_API_URL}/plants`, payload),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
       toast.success("Your Plant has been Added")
       Swal.fire({
         position: "center",
@@ -37,15 +37,15 @@ const AddPlantForm = () => {
       // Query key invalidate
     },
     onError: (error) => {
-      console.log(error);
+      // console.log(error);
     },
     onMutate: (payload) => {
-      console.log("I will post this data --->", payload);
+      // console.log("I will post this data --->", payload);
     },
     onSettled: (data, error) => {
-      console.log(data);
+      // console.log(data);
       if (error) {
-        console.log(error);
+        // console.log(error);
       }
     },
     retry: 3,
@@ -86,7 +86,7 @@ const AddPlantForm = () => {
       // Form Reset
       reset();
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     } finally {
       setLoading(false);
     }

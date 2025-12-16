@@ -26,7 +26,7 @@ const PurchaseModal = ({ closeModal, isOpen, plant }) => {
     }
     const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/create-checkout-session`, paymentInfo)
     window.location.href= data.url
-    console.log(data.url);
+    // console.log(data.url);
   }
 
   return (

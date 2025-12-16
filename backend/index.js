@@ -21,15 +21,15 @@ app.use(express.json())
 // jwt middlewares
 const verifyJWT = async (req, res, next) => {
   const token = req?.headers?.authorization?.split(' ')[1]
-  console.log(token)
+  // console.log(token)
   if (!token) return res.status(401).send({ message: 'Unauthorized Access!' })
   try {
     const decoded = await admin.auth().verifyIdToken(token)
     req.tokenEmail = decoded.email
-    console.log(decoded)
+    // console.log(decoded)
     next()
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     return res.status(401).send({ message: 'Unauthorized Access!', err })
   }
 }
@@ -62,7 +62,7 @@ async function run() {
     // save a plant data in db
     app.post('/plants', async (req, res) => {
       const plantData = req.body;
-      console.log(plantData);
+      // console.log(plantData);
       const result = await plantsCollection.insertOne(plantData)
       res.send(result);
     })
@@ -113,7 +113,7 @@ async function run() {
     // Payment endpoints
     app.post('/create-checkout-session', async (req, res) => {
       const paymentInfo = req.body;
-      console.log(paymentInfo);
+      // console.log(paymentInfo);
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
@@ -349,5 +349,5 @@ app.get('/', (req, res) => {
 // start server
 const port = process.env.PORT || 3000
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`)
+  // console.log(`Server is running on port ${port}`)
 })

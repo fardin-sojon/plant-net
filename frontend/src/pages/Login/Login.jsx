@@ -46,7 +46,7 @@ const Login = () => {
       navigate(from, { replace: true })
       toast.success('Login Successful')
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       setLoading(false)
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setError('root', { type: 'manual', message: 'Invalid email or password' })
@@ -72,7 +72,7 @@ const Login = () => {
       navigate(from, { replace: true })
       toast.success('Login Successful')
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       setLoading(false)
       toast.error(err?.message)
     }

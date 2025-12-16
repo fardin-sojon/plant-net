@@ -26,7 +26,7 @@ const PlantDetails = () => {
       return res.data;
     },
   });
-  console.log(plant);
+  // console.log(plant);
   const { name, image, description, category, quantity, price, seller } =
     plant;
 

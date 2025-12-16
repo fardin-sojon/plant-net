@@ -27,7 +27,7 @@ const ResetPassword = () => {
             toast.success('Password reset email sent! Check your inbox.');
             navigate('/login');
         } catch (err) {
-            console.log(err);
+            // console.log(err);
             toast.error(err.message);
             setLoading(false);
         }

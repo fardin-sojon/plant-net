@@ -52,7 +52,7 @@ const UpdatePlantModal = ({ setIsEditModalOpen, isOpen, plant, refetch }) => {
       setIsEditModalOpen(false)
       setLoading(false)
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       setLoading(false)
       toast.error(err.message)
     }

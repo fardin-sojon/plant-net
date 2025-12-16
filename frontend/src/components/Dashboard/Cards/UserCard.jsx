@@ -61,7 +61,7 @@ const UserCard = ({ user, refetch }) => {
             toast.success('Role updated successfully!')
             setIsOpen(false)
           } catch (err) {
-            console.log(err)
+            // console.log(err)
             toast.error(err.message)
           }
         }}
