@@ -1,51 +1,111 @@
 import { useState } from 'react'
 import UpdateUserRoleModal from '../../Modal/UpdateUserRoleModal'
+import DeleteModal from '../../Modal/DeleteModal'
 import useAxiosSecure from '../../../hooks/useAxiosSecure'
 import toast from 'react-hot-toast'
 
 const UserCard = ({ user, refetch }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const axiosSecure = useAxiosSecure()
 
+  const handleDelete = async (id) => {
+    try {
+      await axiosSecure.delete(`/users/${id}`)
+      refetch()
+      toast.success('User deleted successfully!')
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete user')
+    }
+  }
+
+  const handleApprove = async () => {
+    try {
+      const targetRole = user?.role === 'customer' ? 'seller' : user?.role
+      await axiosSecure.patch(`/users/update/${user?.email}`, {
+        role: targetRole,
+        status: 'Verified'
+      })
+      refetch()
+      toast.success('User verified successfully!')
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message)
+    }
+  }
+
   return (
-    <div className='bg-white p-4 rounded-lg shadow border border-gray-200 space-y-3'>
-      <div className='flex justify-between items-start'>
+    <div className='bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-xs border border-gray-200 dark:border-gray-700 space-y-4 transition hover:shadow-md'>
+      <div className='flex justify-between items-start gap-4'>
         <div>
-          <p className='text-xs text-gray-500 uppercase font-semibold'>Email</p>
-          <p className='text-gray-900 font-medium break-all'>{user?.email}</p>
+          <p className='text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5'>Name</p>
+          <p className='text-gray-800 dark:text-white font-bold'>{user?.name || 'N/A'}</p>
         </div>
         <div className='text-right'>
-           <p className='text-xs text-gray-500 uppercase font-semibold'>Role</p>
-           <p className='text-gray-900 capitalize'>{user?.role}</p>
+           <p className='text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1'>Role</p>
+           <span className={`inline-block px-2.5 py-0.5 text-xs font-bold rounded-full capitalize ${
+             user?.role === 'admin' 
+               ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800' 
+               : user?.role === 'seller'
+                 ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300 border border-green-200 dark:border-green-800'
+                 : 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+           }`}>
+             {user?.role}
+           </span>
         </div>
       </div>
       
-      <div className='flex justify-between items-center'>
+      <div>
+        <p className='text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5'>Email</p>
+        <p className='text-gray-800 dark:text-white font-semibold break-all text-sm'>{user?.email}</p>
+      </div>
+      
+      <div className='flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-700'>
          <div>
-            <p className='text-xs text-gray-500 uppercase font-semibold'>Status</p>
-             {user?.status ? (
-              <p
-                className={`${
-                  user.status === 'Verified' ? 'text-green-500' : user.status === 'Requested' ? 'text-yellow-500' : 'text-red-500'
-                } font-medium`}
-              >
-                {user.status}
-              </p>
-            ) : (
-              <p className='text-red-500 font-medium'>Unavailable</p>
-            )}
+             <p className='text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1'>Status</p>
+             <div className="flex items-center gap-2">
+               <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold rounded-full ${
+                 user?.status === 'Verified' 
+                   ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+                   : user?.status === 'Requested'
+                     ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800 animate-pulse'
+                     : 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+               }`}>
+                 <span className={`w-1 h-1 rounded-full ${
+                   user?.status === 'Verified' 
+                     ? 'bg-emerald-500' 
+                     : user?.status === 'Requested'
+                       ? 'bg-amber-500'
+                       : 'bg-rose-500'
+                 }`} />
+                 {user?.status || 'Unavailable'}
+               </span>
+
+               {(user?.status !== 'Verified' && (user?.status === 'Requested' || user?.role === 'admin' || user?.role === 'seller')) && (
+                 <button
+                   onClick={handleApprove}
+                   className='px-2 py-0.5 text-3xs font-extrabold text-white bg-lime-500 hover:bg-lime-600 rounded-md cursor-pointer transition text-[9px] whitespace-nowrap'
+                 >
+                   Approve
+                 </button>
+               )}
+             </div>
          </div>
          
-         <button
-            onClick={() => setIsOpen(true)}
-            className='relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight'
-          >
-            <span
-              aria-hidden='true'
-              className='absolute inset-0 bg-green-200 opacity-50 rounded-full'
-            ></span>
-            <span className='relative'>Update Role</span>
-          </button>
+          <div className='flex gap-2'>
+            <button
+              onClick={() => setIsOpen(true)}
+              className='px-2.5 py-1 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 rounded-lg cursor-pointer transition'
+            >
+              Update Role
+            </button>
+            
+            <button
+              onClick={() => setIsDeleteOpen(true)}
+              className='px-2.5 py-1 text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 rounded-lg cursor-pointer transition'
+            >
+              Delete
+            </button>
+          </div>
       </div>
 
       <UpdateUserRoleModal
@@ -61,12 +121,18 @@ const UserCard = ({ user, refetch }) => {
             toast.success('Role updated successfully!')
             setIsOpen(false)
           } catch (err) {
-            // console.log(err)
             toast.error(err.message)
           }
         }}
         user={user}
         refetch={refetch}
+      />
+      <DeleteModal
+        isOpen={isDeleteOpen}
+        closeModal={() => setIsDeleteOpen(false)}
+        handleDelete={handleDelete}
+        id={user?._id}
+        itemName={user?.email}
       />
     </div>
   )
