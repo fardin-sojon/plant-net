@@ -191,4 +191,4 @@ npm run dev
 ## 👨‍💻 Developer
 
 **Fardin Rahman Sojon**  
-🐙 [github.com/fardin-sojon](https://github.com/fardin-sojon)
+🐙 [Github](https://github.com/fardin-sojon)
