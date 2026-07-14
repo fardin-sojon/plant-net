@@ -631,6 +631,34 @@ async function run() {
       res.send(result)
     })
 
+    // Get all reviews (Admin only)
+    app.get('/all-reviews', verifyJWT, async (req, res) => {
+      const requesterEmail = req.tokenEmail
+      const requesterUser = await usersCollection.findOne({ 
+        email: { $regex: new RegExp(`^${requesterEmail}$`, 'i') } 
+      })
+      if (!requesterUser || requesterUser.role !== 'admin') {
+        return res.status(403).send({ message: 'Forbidden access' })
+      }
+      const result = await reviewsCollection.find().sort({ timestamp: -1 }).toArray()
+      res.send(result)
+    })
+
+    // Delete a review (Admin only)
+    app.delete('/reviews/:id', verifyJWT, async (req, res) => {
+      const requesterEmail = req.tokenEmail
+      const requesterUser = await usersCollection.findOne({ 
+        email: { $regex: new RegExp(`^${requesterEmail}$`, 'i') } 
+      })
+      if (!requesterUser || requesterUser.role !== 'admin') {
+        return res.status(403).send({ message: 'Forbidden access' })
+      }
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await reviewsCollection.deleteOne(query)
+      res.send(result)
+    })
+
     // --- Coupons Endpoints ---
     app.post('/coupons', verifyJWT, async (req, res) => {
       const requesterEmail = req.tokenEmail
