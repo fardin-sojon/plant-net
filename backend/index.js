@@ -634,13 +634,17 @@ async function run() {
     // Get all reviews (Admin only)
     app.get('/all-reviews', verifyJWT, async (req, res) => {
       const requesterEmail = req.tokenEmail
+      console.log('all-reviews hit. requesterEmail:', requesterEmail)
       const requesterUser = await usersCollection.findOne({ 
         email: { $regex: new RegExp(`^${requesterEmail}$`, 'i') } 
       })
+      console.log('requesterUser:', requesterUser)
       if (!requesterUser || requesterUser.role !== 'admin') {
+        console.log('Access forbidden. Role:', requesterUser?.role)
         return res.status(403).send({ message: 'Forbidden access' })
       }
       const result = await reviewsCollection.find().sort({ timestamp: -1 }).toArray()
+      console.log('Sending reviews count:', result.length)
       res.send(result)
     })
 
