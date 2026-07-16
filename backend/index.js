@@ -195,6 +195,98 @@ async function run() {
       }
     })
 
+    // Cash on Delivery Order Creation
+    app.post('/create-cod-order', async (req, res) => {
+      try {
+        const { items, customer, couponCode } = req.body;
+        const price = items.reduce((total, item) => total + item.price * item.quantity, 0);
+
+        let discount = 0;
+        let discountRatio = 1;
+
+        if (couponCode) {
+          const coupon = await couponsCollection.findOne({ code: couponCode.toUpperCase() });
+          if (coupon) {
+            if (coupon.discountType === 'percent') {
+              discount = (parseFloat(coupon.discountAmount) / 100) * price;
+            } else {
+              discount = parseFloat(coupon.discountAmount);
+            }
+            discount = Math.min(discount, price);
+            discountRatio = (price - discount) / price;
+          }
+        }
+
+        const transactionId = 'COD-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+
+        // Create Orders
+        const orders = items.map(item => ({
+          plantId: item._id,
+          transactionId: transactionId,
+          customer: customer.email,
+          customerName: customer.recipientName || customer.name || '',
+          status: 'Pending',
+          seller: item.seller,
+          name: item.name,
+          category: item.category,
+          quantity: item.quantity,
+          price: Math.round(item.price * discountRatio * 100) / 100, // Apply discount proportionally
+          image: item.image,
+          address: customer.address || 'Dhaka',
+          phone: customer.phone || '',
+          createdAt: new Date(),
+          timestamp: Date.now(),
+          paymentType: 'COD'
+        }));
+
+        // Check stock before decrementing
+        for (const order of orders) {
+          const plant = await plantsCollection.findOne({ _id: new ObjectId(order.plantId) });
+          if (!plant || plant.quantity < order.quantity) {
+            return res.status(400).send({ message: `Insufficient stock for ${order.name}` });
+          }
+        }
+
+        // Decrement stock
+        for (const order of orders) {
+          await plantsCollection.updateOne(
+            { _id: new ObjectId(order.plantId) },
+            { $inc: { quantity: -order.quantity } }
+          );
+        }
+
+        await ordersCollection.insertMany(orders);
+
+        // Save payment data to payments collection
+        const paymentData = {
+          sessionId: null,
+          paymentIntentId: transactionId,
+          customer: customer.email,
+          customerName: customer.recipientName || customer.name || '',
+          amount: Math.round((price - discount) * 100) / 100,
+          currency: 'usd',
+          paymentStatus: 'Unpaid',
+          paymentMethod: 'COD',
+          address: customer.address || 'Dhaka',
+          phone: customer.phone || '',
+          items: orders.map(order => ({
+            plantId: order.plantId,
+            name: order.name,
+            quantity: order.quantity,
+            price: order.price
+          })),
+          createdAt: new Date(),
+          timestamp: Date.now()
+        }
+        await paymentsCollection.insertOne(paymentData)
+
+        res.send({ success: true, transactionId });
+      } catch (error) {
+        console.error('Error creating COD order:', error);
+        res.status(500).send({ message: error.message, success: false });
+      }
+    })
+
     app.post('/payment-success', async (req, res) => {
       try {
         const { sessionId } = req.body;
